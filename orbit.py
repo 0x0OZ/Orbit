@@ -7,8 +7,6 @@ import argparse
 import webbrowser
 import concurrent.futures
 
-from time import sleep
-
 from core.utils import getNewAddresses
 from core.utils import ranker
 from core.utils import genLocation
@@ -17,10 +15,10 @@ from core.exporter import exporter
 from core.prepareGraph import prepareGraph
 from core.getTransactions import getTransactions
 from core.colors import green, white, red, info, run, end
-from core.utils import SIZE
-from core.utils import FROM
-from core.utils import TO
-
+from core.utils import getSize
+from core.globalVars import SIZE
+from core.globalVars import FROM
+from core.globalVars import TO
 from DB import DB
 
 parse = argparse.ArgumentParser()
@@ -66,9 +64,7 @@ print(
 
 
 
-
-
-database = []  # {from : {to : count}} # IGNORE... CHANGED STUFF
+database = []  # array of DB 
 processed = set()
 
 seeds = args.seeds.split(",")
@@ -109,12 +105,10 @@ doneEdges = []
 txn: DB
 for txn in database:
     x, y = genLocation()
-    print("n: ", txn)
-    size = 20 #txn[SIZE]
+    
+    size = getSize(database,txn.from_,FROM)
     node = txn.from_
-    if txn.to is None or txn.from_ is None:
-        print("oz wtf")
-        txn.print_details()
+
     if node not in doneNodes:
         doneNodes.append(node)
         jsoned["nodes"].append(
@@ -126,15 +120,11 @@ for txn in database:
     for txn2 in database:
         if txn2.from_ != node:
             continue
-        uniqueSize = 19 #childNode.to
-        #print("child TXN2: ", txn2)
-        if uniqueSize > 20:
-            uniqueSize = 20
-        if uniqueSize < 20:
-            uniqueSize = 15
+        
+        uniqueSize = getSize(database,txn2.to,TO)
+        
         x, y = genLocation()
         childNode = txn2.to if txn2.to else ""
-        #print("child: ",childNode)
         if childNode not in doneNodes:
             doneNodes.append(childNode)
             jsoned["nodes"].append(

@@ -2,11 +2,9 @@ import random
 
 from DB import DB
 
+from core.globalVars import FROM
+from core.globalVars import SIZE
 
-#COUNT = "count"
-SIZE = "size"
-FROM = "from"
-TO = "to"
 
 def pageLimit(n):
     return int((round(n, 49) / 49) + 1)
@@ -17,16 +15,16 @@ def round(n, m):
     return n + m - r if r + r >= m else n - r
 
 
-def ranker(database, top):  # db {from : {to : addr, count:n}} # BROKEN, FIX LATER
+def ranker(database, top):
     newDatabase = []
-    print("oldDB: ", database)
+
     for node in database:
         print("node: ", node)
         newDatabase.append(node)
-        #newDatabase[node] = {"x": 0}
+        # newDatabase[node] = {"x": 0}
         topSize = [0 for i in range(top)]
         topAdd = ["" for i in range(top)]
-        
+
         if node[SIZE] > minimum:
             index = topSize.index(minimum)
             # ...
@@ -50,15 +48,24 @@ def genLocation():
     return x, y
 
 
+def getSize(database, attr,attr_name):
+    tx: DB
+    for tx in database:
+        size = 10
+        if getattr(tx, attr_name) == attr:
+            size += 1
+        tx.size = size
+    return size
+
+
 def getNewAddresses(database: list, processed):
     new = []
-    
-    txn:DB 
+
+    txn: DB
     for txn in database:
         if txn.from_ not in processed:
-            
             print("newAddr: ", txn.from_)
             new.append(txn.from_)
-        
-    return new # no need to check for null 
-    #return set(filter(None, new))
+
+    return new  # no need to check for null
+    # return set(filter(None, new))

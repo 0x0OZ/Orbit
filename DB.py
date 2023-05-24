@@ -1,4 +1,4 @@
-FROM = "from_"
+from core.globalVars import FROM
 
 class DB:
     blockNumber: int
