@@ -16,6 +16,10 @@
 
 ![graph-demo](https://i.ibb.co/rx76Ryt/Screenshot-2019-07-26-03-41-34.png)
 
+## Important 
+This implemntation is made for Ethereum network, the main tool was designed for bitcion blockchain used an old website to fetch the information.
+You need etherscan API key to get the best experience!
+
 ### Introduction
 Orbit is designed to explore network of a blockchain wallet by recursively crawling through transaction history. The data is rendered as a graph to reveal major sources, sinks and suspicious connections.
 
@@ -25,27 +29,27 @@ Orbit is designed to explore network of a blockchain wallet by recursively crawl
 
 Let's start by crawling transaction history of a wallet
 ```
-python3 orbit.py -s 1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F
+python3 orbit.py -s 0xdac17f958d2ee523a2206206994597c13d831ec7
 ```
 Crawling multiple wallets is no different.
 ```
-python3 orbit.py -s 1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F,1ETBbsHPvbydW7hGWXXKXZ3pxVh3VFoMaX
+python3 orbit.py -s 0xdac17f958d2ee523a2206206994597c13d831ec7,0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b
 ```
 Orbit fetches last 50 transactions from each wallet by default, but it can be tuned with `-l` option.
 ```
-python3 orbit.py -s 1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F -l 100
+python3 orbit.py -s 0xdac17f958d2ee523a2206206994597c13d831ec7 -l 100
 ```
 Orbit's default crawling depth is 3 i.e. it fetches the history of target wallet(s), crawls the newly found wallets and then crawls the wallets in the result again. The crawling depth can be increased or decresead with `-d` option.
 ```
-python3 orbit.py -s 1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F -d 2
+python3 orbit.py -s 0xdac17f958d2ee523a2206206994597c13d831ec7 -d 2
 ```
 Wallets that have made just a couple of interactions with our target may not be important, Orbit can be told to crawl top N wallets at each level by using the `-t` option.
 ```
-python3 orbit.py -s 1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F -t 20
+python3 orbit.py -s 0xdac17f958d2ee523a2206206994597c13d831ec7 -t 20
 ```
 If you want to view the collected data with a graph viewer of your choice, you can use -o option.
 ```
-python3 orbit.py -s 1AJbsFZ64EpEfS5UAjAfcUG8pH8Jn3rn1F -o output.graphml
+python3 orbit.py -s 0xdac17f958d2ee523a2206206994597c13d831ec7 -o output.graphml
 ```
 Support Formats
 

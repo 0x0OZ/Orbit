@@ -14,5 +14,15 @@ def get_acc_txns(address, offset):
     return f"https://api.etherscan.io/api?module=account&action=txlist&address={address}&startblock=0&endblock=99999999&page=1&offset={offset}&sort=asc&apikey={API_KEY}"
 
 
+def request_txns(address,offset):
+    url = f"https://api.etherscan.io/api?module=account&action=txlist&address={address}&startblock=0&endblock=99999999&page=1&offset={offset}&sort=asc&apikey={API_KEY}"
+    return requests.get(url).json()
+
+
+def request_inner_txns(address, offset):
+    url = f"https://api.etherscan.io/api?module=account&action=txlistinternal&address={address}&startblock=0&endblock=99999999&page=1&offset={offset}&sort=asc&apikey={API_KEY}"
+    return requests.get(url).json()
+
+
 def requester(address, offset):
     return requests.get(get_acc_txns(address, offset)).json()

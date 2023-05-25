@@ -1,5 +1,5 @@
 from core.globalVars import FROM
-
+from core.globalVars import ZERO_ADDRESS
 class DB:
     blockNumber: int
     hash: str
@@ -9,7 +9,7 @@ class DB:
     confirmations: int
     contractAddress: str
     cumulativeGasUsed: int
-    from_: str
+    from_: str # because "from" is reserved keyword
     functionName: str
     gas: int
     gasPrice: int
@@ -23,6 +23,7 @@ class DB:
     transactionIndex: int
     txreceipt_status: str
     value: int
+    size: int # not part of EVM tx
 
     def __init__(
         self,
@@ -33,7 +34,7 @@ class DB:
         confirmations: int = None,
         contractAddress: str = None,
         cumulativeGasUsed: int = None,
-        from_: str = "0x",
+        from_: str = ZERO_ADDRESS,
         functionName: str = None,
         gas: int = None,
         gasPrice: int = None,
@@ -42,10 +43,11 @@ class DB:
         isError: int = None,
         methodId: str = None,
         timeStamp: int = None,
-        to: str = "0x",
+        to: str = ZERO_ADDRESS,
         txreceipt_status: str = None,
         value: int = None,
         blockNumber: int = None,
+        size: int = 0
     ):
         self.blockNumber = blockNumber
         self.hash = hash
@@ -56,7 +58,7 @@ class DB:
         self.contractAddress = contractAddress
         self.cumulativeGasUsed = cumulativeGasUsed
         self.from_ = from_
-        setattr(self, FROM, from_)  # because from is reserved
+        setattr(self, FROM, from_)  
         self.functionName = functionName
         self.gas = gas
         self.gasPrice = gasPrice
@@ -68,6 +70,7 @@ class DB:
         self.to = to
         self.txreceipt_status = txreceipt_status
         self.value = value
+        self.size = size 
 
     def print_details(self):
         print("blockNumber:", self.blockNumber)

@@ -3,7 +3,7 @@ import random
 from DB import DB
 
 from core.globalVars import FROM
-from core.globalVars import SIZE
+from core.colors import red, info
 
 
 def pageLimit(n):
@@ -17,30 +17,20 @@ def round(n, m):
 
 def ranker(database, top):
     newDatabase = []
-
-    for node in database:
-        print("node: ", node)
-        newDatabase.append(node)
-        # newDatabase[node] = {"x": 0}
-        topSize = [0 for i in range(top)]
-        topAdd = ["" for i in range(top)]
-
-        if node[SIZE] > minimum:
-            index = topSize.index(minimum)
-            # ...
-        for to in list(database[node].keys()):
-            minimum = min(topSize)
-            print("a: ", to)
-            if database[node][to] > minimum:
-                index = topSize.index(minimum)
-                topSize[index] = database[node]
-                topAdd[index] = to
-        for size, address in zip(topSize, topAdd):
-            newDatabase[node][address] = size
-        print("newDB: ", newDatabase)
-
+    sizes = []
+    tx: DB
+    for tx in database:
+        tx.size = getSize(database, getattr(tx, FROM), FROM)
+        sizes.append(tx.size)
+    index = 0
+    while max(sizes) != -1 and index != top:
+        maximum = sizes.index(max(sizes))
+        sizes[maximum] = -1
+        newDatabase.append(database[maximum])
+        index += 1
+    cmp = len(database) - len(newDatabase)
+    print("%sConnections Ignored: %s" % (red if cmp else info + " ", cmp))
     return newDatabase
-
 
 def genLocation():
     x, y = random.randint(1, 800), random.randint(1, 500)
@@ -48,7 +38,7 @@ def genLocation():
     return x, y
 
 
-def getSize(database, attr,attr_name):
+def getSize(database, attr, attr_name):
     tx: DB
     for tx in database:
         size = 10
@@ -60,12 +50,9 @@ def getSize(database, attr,attr_name):
 
 def getNewAddresses(database: list, processed):
     new = []
+    tx: DB
+    for tx in database:
+        if getattr(tx, FROM) not in processed:
+            new.append(getattr(tx, FROM))
 
-    txn: DB
-    for txn in database:
-        if txn.from_ not in processed:
-            print("newAddr: ", txn.from_)
-            new.append(txn.from_)
-
-    return new  # no need to check for null
-    # return set(filter(None, new))
+    return new

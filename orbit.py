@@ -2,7 +2,6 @@
 
 import os
 import json
-import random
 import argparse
 import webbrowser
 import concurrent.futures
@@ -87,7 +86,7 @@ def crawl(addresses, processed, database, limit):
 try:
     for i in range(depth):
         print("%s Crawling level %i" % (run, i + 1))
-        #database = ranker(database, top + 1)
+        database = ranker(database, top + 1)
         toBeProcessed = getNewAddresses(database, processed)
         #toBeProcessed = database
         print("%s %i addresses to crawl" % (info, len(toBeProcessed)))
@@ -95,7 +94,7 @@ try:
 except KeyboardInterrupt:
     pass
 
-#database = ranker(database, top)
+database = ranker(database, top)
 
 jsoned = {"edges": [], "nodes": []}
 num = 0
@@ -120,9 +119,9 @@ for txn in database:
     for txn2 in database:
         if txn2.from_ != node:
             continue
-        
+
         uniqueSize = getSize(database,txn2.to,TO)
-        
+
         x, y = genLocation()
         childNode = txn2.to if txn2.to else ""
         if childNode not in doneNodes:
