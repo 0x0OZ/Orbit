@@ -1,5 +1,10 @@
-from core.globalVars import FROM
-from core.globalVars import ZERO_ADDRESS
+FROM = "from_"
+SIZE = "size"
+TO = "to"
+ZERO_ADDRESS = "0x" + ("0" * 40) 
+
+LABELS_FILENAME = "labels/labels.json"
+IGNORES_FILENAME = "labels/ignore.txt"
 class DB:
     blockNumber: int
     hash: str
@@ -58,7 +63,7 @@ class DB:
         self.contractAddress = contractAddress
         self.cumulativeGasUsed = cumulativeGasUsed
         self.from_ = from_
-        setattr(self, FROM, from_)  
+        setattr(self, FROM, from_)  # self.from
         self.functionName = functionName
         self.gas = gas
         self.gasPrice = gasPrice

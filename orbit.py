@@ -6,19 +6,15 @@ import argparse
 import webbrowser
 import concurrent.futures
 
-from core.utils import getNewAddresses
-from core.utils import ranker
-from core.utils import genLocation
+from core.utils import getNewAddresses, ranker, genLocation
 from core.getQuark import getQuark
 from core.exporter import exporter
 from core.prepareGraph import prepareGraph
 from core.getTransactions import getTransactions
 from core.colors import green, white, red, info, run, end
-from core.utils import getSize
-from core.globalVars import SIZE
-from core.globalVars import FROM
-from core.globalVars import TO
-from DB import DB
+from core.utils import getNodeName
+from core.config import *
+from get_labels import get_tag_names, append_to_labels
 
 parse = argparse.ArgumentParser()
 parse.add_argument("-s", "--seeds", help="target blockchain address(es)", dest="seeds")
@@ -42,7 +38,14 @@ parse.add_argument(
     help="maximum number of addresses to fetch from one address",
     dest="limit",
     type=int,
-    default=100,
+    default=20,
+)
+parse.add_argument(
+    "-a",
+    "--addresses",
+    help="get labels for addresses",
+    dest="labels",
+    action="store_true",
 )
 args = parse.parse_args()
 
@@ -62,8 +65,7 @@ print(
 )
 
 
-
-database = []  # array of DB 
+database = []  # array of DB
 processed = set()
 
 seeds = args.seeds.split(",")
@@ -72,15 +74,16 @@ for seed in seeds:
 
 getQuark()
 
+
 def crawl(addresses, processed, database, limit):
     threadpool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
     futures = (
         threadpool.submit(getTransactions, address, processed, database, limit)
         for address in addresses
     )
+
     for i, _ in enumerate(concurrent.futures.as_completed(futures)):
         print("%s Progress: %i/%i        " % (info, i + 1, len(addresses)), end="\r")
-
 
 
 try:
@@ -88,7 +91,7 @@ try:
         print("%s Crawling level %i" % (run, i + 1))
         database = ranker(database, top + 1)
         toBeProcessed = getNewAddresses(database, processed)
-        #toBeProcessed = database
+        # toBeProcessed = database
         print("%s %i addresses to crawl" % (info, len(toBeProcessed)))
         crawl(toBeProcessed, processed, database, limit)
 except KeyboardInterrupt:
@@ -102,10 +105,14 @@ doneNodes = []
 doneEdges = []
 
 txn: DB
+
 for txn in database:
     x, y = genLocation()
-    
-    size = getSize(database,txn.from_,FROM)
+    if args.labels:
+        labels = get_tag_names([txn.from_, txn.to])
+        append_to_labels(labels)
+
+    size = txn.size_from
     node = txn.from_
 
     if node not in doneNodes:
@@ -119,8 +126,7 @@ for txn in database:
     for txn2 in database:
         if txn2.from_ != node:
             continue
-
-        uniqueSize = getSize(database,txn2.to,TO)
+        uniqueSize = txn2.size_to
 
         x, y = genLocation()
         childNode = txn2.to if txn2.to else ""
@@ -128,7 +134,7 @@ for txn in database:
             doneNodes.append(childNode)
             jsoned["nodes"].append(
                 {
-                    "label": childNode,
+                    "label": getNodeName(childNode),
                     "x": x,
                     "y": y,
                     "id": "id=" + childNode,
@@ -147,8 +153,8 @@ for txn in database:
             )
         num += 1
 
-print("%s Total wallets:%i" % (info, len(jsoned["nodes"])))
-print("%s Total connections:%i" % (info, len(jsoned["edges"])))
+print("%s Total wallets: %i" % (info, len(jsoned["nodes"])))
+print("%s Total connections: %i" % (info, len(jsoned["edges"])))
 
 render = json.dumps(jsoned).replace(" ", "").replace("'", '"')
 
